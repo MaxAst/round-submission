@@ -48,7 +48,7 @@ I decided to choose Remix as a monolithic approach to building the SaaS. The rea
 - stronger multi tenancy
 - better floating point handling via decimal.js
 - refreshing consent token after 90 days
-- proper pagination for Yapily API Requests
+- proper pagination for Yapily API Requests and DB queries
 - tests!
 - convert currency code to symbol for UI
 - differentiating between credit and debit transactions, loans etc.

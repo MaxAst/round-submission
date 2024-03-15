@@ -91,6 +91,15 @@ export const getAccounts = async (tenantId: string) => {
   });
 };
 
+export const getAccountsWithTransactions = async (tenantId: string) => {
+  return db.query.accounts.findMany({
+    where: eq(schema.accounts.tenantId, tenantId),
+    with: {
+      transactions: true,
+    },
+  });
+};
+
 export const getTransactions = async (tenantId: string) => {
   return db.query.accounts.findMany({
     where: eq(schema.accounts.tenantId, tenantId),

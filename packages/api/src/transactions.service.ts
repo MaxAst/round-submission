@@ -14,18 +14,15 @@ export const insertTransactionsFromYapily = (
     .values(
       data.map((transaction) => ({
         accountId: accountId,
-        status: transaction.status,
-        currency: transaction.currency,
         // TODO: use decimal.js for better precision:
         amount: transaction.amount?.toFixed(2),
-        transactingParty: transaction.amount
-          ? // overly simplistic approach for demo sake, to determine who we transacted with
-            transaction.amount > 0
-            ? transaction.payeeDetails?.name
-            : transaction.payerDetails?.name
-          : undefined,
+        currency: transaction.currency,
+        status: transaction.status,
+        reference: transaction.reference,
+        description: transaction.description,
+        payee: transaction.payeeDetails?.name,
+        payer: transaction.payerDetails?.name,
         date: transaction.date ? new Date(transaction.date) : undefined,
-
         createdAt: new Date(),
         updatedAt: new Date(),
       }))
@@ -41,6 +38,7 @@ export const syncYapilyTransactions = async (
   for (const account of accounts) {
     console.log(`Syncing transactions for account ${account.yapilyId}`);
     if (!account.yapilyId) continue;
+    // TODO: add pagination
     const response = await financialDataAPI.getTransactions(
       account.yapilyId,
       consentToken

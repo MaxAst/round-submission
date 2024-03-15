@@ -19,7 +19,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     if (!consent || !applicationUserId) throw new Error("Invalid request");
 
     const user = await getUserById(applicationUserId);
-    await saveYapilyConsentToken(user.id, consent);
+    if (user) {
+      await saveYapilyConsentToken(user.id, consent);
+    }
 
     return redirect("/accounts");
   } catch (error) {

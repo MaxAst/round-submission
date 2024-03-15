@@ -6,6 +6,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { tenants } from "./tenants";
+import { transactions } from "./transactions";
+import { relations } from "drizzle-orm";
 
 export const accounts = pgTable("accounts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -30,3 +32,7 @@ export const accounts = pgTable("accounts", {
 });
 
 export type Account = typeof accounts.$inferSelect; // return type when queried
+
+export const accountsRelations = relations(accounts, ({ many }) => ({
+  transactions: many(transactions),
+}));
