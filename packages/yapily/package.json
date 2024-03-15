@@ -1,0 +1,23 @@
+{
+  "name": "@round/yapily",
+  "version": "0.1.0",
+  "private": true,
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "openapi-generator-cli generate -g typescript-axios -o src/generated -i https://openapi.yapily.com/openapi.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.12.0",
+    "tsx": "^4.7.1"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
+}
