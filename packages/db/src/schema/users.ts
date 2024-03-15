@@ -9,7 +9,9 @@ export const users = pgTable("users", {
   yapilyConsentToken: varchar("yapily_consent_token"),
   yapilyUuid: uuid("yapily_uuid"),
 
-  tenantId: uuid("tenant_id").references(() => tenants.id),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at"),

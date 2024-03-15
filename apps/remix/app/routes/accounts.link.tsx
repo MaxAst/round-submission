@@ -1,5 +1,3 @@
-import { db, eq, schema } from "@round/db";
-import { authorizationAPI, institutionsAPI } from "@round/yapily";
 import {
   ActionFunctionArgs,
   json,
@@ -9,7 +7,8 @@ import {
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { isAxiosError } from "axios";
 
-import { USER_ID } from "~/constants";
+import { getLoggedInUser, initiateOpenBankingRequest } from "@round/api";
+import { institutionsAPI } from "@round/yapily";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Accounts | Round" }];
@@ -22,43 +21,15 @@ export const loader = async () => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
-    // TOOD: add cookie-based session
-    const user = await db.query.users.findFirst({
-      where: eq(schema.users.id, USER_ID),
-    });
-    if (!user) throw new Error("User not found");
+    const user = await getLoggedInUser();
 
     const formData = await request.formData();
     const { institutionId } = Object.fromEntries(formData);
 
-    const result = await authorizationAPI.initiateAccountRequest({
-      institutionId: institutionId.toString(),
-      applicationUserId: user.id,
-      callback: process.env.YAPILY_CALLBACK_URL,
-    });
-
-    console.log(result.data.data);
-
-    const authUrl = result.data.data?.authorisationUrl;
-    if (!authUrl) {
-      throw new Error("Authorisation URL not returned from Yapily");
-    }
-
-    const consentToken = result.data.data?.consentToken;
-    if (consentToken) {
-      await db
-        .update(schema.users)
-        .set({ yapilyConsentToken: consentToken })
-        .where(eq(schema.users.id, USER_ID));
-    }
-
-    const userUuid = result.data.data?.userUuid;
-    if (userUuid) {
-      await db
-        .update(schema.users)
-        .set({ yapilyUuid: userUuid })
-        .where(eq(schema.users.id, USER_ID));
-    }
+    const authUrl = await initiateOpenBankingRequest(
+      institutionId.toString(),
+      user.id
+    );
 
     return redirect(authUrl);
   } catch (error) {

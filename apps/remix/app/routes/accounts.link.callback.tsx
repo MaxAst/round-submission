@@ -5,7 +5,7 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { db, eq, schema } from "@round/db";
+import { getUserById, saveYapilyConsentToken } from "@round/api";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Accounts | Round" }];
@@ -18,15 +18,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const applicationUserId = url.searchParams.get("application-user-id");
     if (!consent || !applicationUserId) throw new Error("Invalid request");
 
-    const user = await db.query.users.findFirst({
-      where: eq(schema.users.id, applicationUserId),
-    });
-    if (!user) throw new Error("User not found");
-
-    await db
-      .update(schema.users)
-      .set({ yapilyConsentToken: consent })
-      .where(eq(schema.users.id, applicationUserId));
+    const user = await getUserById(applicationUserId);
+    await saveYapilyConsentToken(user.id, consent);
 
     return redirect("/accounts");
   } catch (error) {

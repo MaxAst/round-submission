@@ -1,71 +1,21 @@
-import { db, eq, schema } from "@round/db";
-import { financialDataAPI } from "@round/yapily";
 import { json, type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { TENANT_ID, USER_ID } from "~/constants";
-import { isNotFalsey } from "~/utils";
+
+import { getLoggedInUser, getAccounts, syncYapilyAccounts } from "@round/api";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Accounts | Round" }];
 };
 
 export const loader = async () => {
-  const user = await db.query.users.findFirst({
-    where: eq(schema.users.id, USER_ID),
-  });
+  const user = await getLoggedInUser();
+  const accounts = await getAccounts(user.tenantId);
 
-  const accounts = await db.query.accounts.findMany({
-    where: eq(schema.accounts.tenantId, TENANT_ID),
-  });
-
-  // we only want to fetch accounts if the user has a consent token and if there are no accounts in the database
+  // we only want to sync accounts from Yapily if the user has a consent token and if there are no accounts in the database
   // this is to avoid making unnecessary requests to the Yapily API, which is only supoosed to be used in the sync job
-  if (user?.yapilyConsentToken && accounts.length === 0) {
-    const response = await financialDataAPI.getAccounts(
-      user.yapilyConsentToken
-    );
-    const data = response.data.data;
-    if (data) {
-      const rows = await db
-        .insert(schema.accounts)
-        .values(
-          data.map((account) => ({
-            tenantId: TENANT_ID,
-            yapilyId: account.id,
-
-            currency: account.currency,
-            // TODO: use decimal.js for better precision:
-            balance: account.balance?.toFixed(2),
-
-            type: account.type,
-            usageType: account.usageType,
-            accountType: account.accountType,
-
-            accountNames: account.accountNames
-              ?.map((acc) => acc.name)
-              .filter(isNotFalsey),
-
-            // TODO: handle multiple account identifications
-            iban: Array.from(account.accountIdentifications ?? [])?.find(
-              (id) => id.type === "IBAN"
-            )?.identification,
-            accountNumber: Array.from(
-              account.accountIdentifications ?? []
-            )?.find((id) => id.type === "ACCOUNT_NUMBER")?.identification,
-            sortCode: Array.from(account.accountIdentifications ?? [])?.find(
-              (id) => id.type === "SORT_CODE"
-            )?.identification,
-
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }))
-        )
-        .returning();
-      return json({ accounts: rows });
-    } else {
-      // TODO: handle situation where no accounts are found
-      return json({ accounts: [] });
-    }
+  if (user.yapilyConsentToken && accounts.length === 0) {
+    const rows = await syncYapilyAccounts(user.yapilyConsentToken);
+    return json({ accounts: rows });
   }
 
   return json({ accounts });
