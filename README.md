@@ -52,3 +52,7 @@ I decided to choose Remix as a monolithic approach to building the SaaS. The rea
 - tests!
 - convert currency code to symbol for UI
 - differentiating between credit and debit transactions, loans etc.
+- caching of db results (e.g. monthly spend/income values)
+- getting proper values for bank name (can be retrieved from institution API) and payment method (couldn't find this in the Yapily API)
+- only sync transactions that are newer than what's already in the db
+- add the runrate calculation (similar to what I already do in getMonthlyStats)
