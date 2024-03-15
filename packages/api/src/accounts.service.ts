@@ -4,7 +4,7 @@ import {
   financialDataAPI,
   type AccountApiListResponse,
 } from "@round/yapily";
-import { TENANT_ID, isNotFalsey } from ".";
+import { isNotFalsey } from ".";
 
 export const initiateOpenBankingRequest = async (
   institutionId: string,
@@ -41,18 +41,23 @@ export const initiateOpenBankingRequest = async (
 };
 
 export const insertAccountsFromYapily = (
-  data: NonNullable<AccountApiListResponse["data"]>
+  data: NonNullable<AccountApiListResponse["data"]>,
+  tenantId: string
 ) => {
   return db
     .insert(schema.accounts)
     .values(
       data.map((account) => ({
-        tenantId: TENANT_ID,
+        tenantId: tenantId,
         yapilyId: account.id,
 
         currency: account.currency,
-        // TODO: use decimal.js for better precision:
-        balance: account.balance?.toFixed(2),
+
+        // for sake of the demo, we turn accounts with negative balances into positive balances (sandbox accounts only have negative balances)
+        balance: account.balance
+          ? // TODO: use decimal.js for better precision:
+            Math.abs(account.balance).toFixed(2)
+          : undefined,
 
         type: account.type,
         usageType: account.usageType,
@@ -86,11 +91,20 @@ export const getAccounts = async (tenantId: string) => {
   });
 };
 
-export const syncYapilyAccounts = async (consentToken: string) => {
+export const getTransactions = async (tenantId: string) => {
+  return db.query.accounts.findMany({
+    where: eq(schema.accounts.tenantId, tenantId),
+  });
+};
+
+export const syncYapilyAccounts = async (
+  consentToken: string,
+  tenantId: string
+) => {
   const response = await financialDataAPI.getAccounts(consentToken);
   const data = response.data.data;
   if (data) {
-    return insertAccountsFromYapily(data);
+    return insertAccountsFromYapily(data, tenantId);
   }
   return [];
 };

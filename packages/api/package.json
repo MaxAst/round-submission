@@ -12,7 +12,7 @@
     "int:test": "pnpm with-env vitest **/integration/*.test.ts",
     "clean": "rm -rf .turbo node_modules dist",
     "typecheck": "tsc --noEmit",
-    "cli": "tsx src/cli.ts",
+    "sync": "pnpm with-env tsx src/sync.ts",
     "lint": "biome lint ./src",
     "lint:fix": "biome check --apply ./src",
     "format": "biome format --write ./src",

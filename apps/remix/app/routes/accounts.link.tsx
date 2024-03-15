@@ -51,9 +51,9 @@ export default function LinkAccounts() {
   const actionData = useActionData<typeof action>();
 
   return (
-    <div className="flex flex-col items-center pt-32">
+    <div className="flex flex-col items-center pt-20">
       <h1 className="text-4xl font-bold pb-4">Select Your Bank</h1>
-      <ul className="min-w-72 min-h-96 bg-slate-100 rounded-md p-3 border-slate-200 border-[1px] shadow-md">
+      <ul className="min-w-72 min-h-96 bg-[#f5f0ef] rounded-md p-3 border-slate-200 border-[1px] shadow-md">
         {data.institutions.data?.map((institution) => (
           <li key={institution.id}>
             <form method="post">
@@ -65,7 +65,7 @@ export default function LinkAccounts() {
               <button
                 type="submit"
                 aria-label="select"
-                className="bg-slate-300 p-4 rounded-md cursor-pointer hover:bg-slate-400 w-full"
+                className="bg-zinc-400 rounded-xl shadow-lg p-4 cursor-pointer hover:bg-zinc-600 w-full text-white"
               >
                 {institution.name}
               </button>
