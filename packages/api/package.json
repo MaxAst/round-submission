@@ -21,6 +21,8 @@
   "dependencies": {
     "@round/db": "workspace:*",
     "@round/yapily": "workspace:*",
+    "dayjs": "^1.11.10",
+    "decimal.js": "^10.4.3",
     "nanoid": "^5.0.6",
     "zod": "^3.22.4"
   },

@@ -12,7 +12,7 @@ import { relations } from "drizzle-orm";
 export const transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
 
-  amount: decimal("amount"),
+  amount: decimal("amount", { precision: 19, scale: 4 }),
   currency: varchar("currency", { length: 3 }),
   status: varchar("status", { length: 256 }),
   reference: varchar("reference", { length: 256 }),
