@@ -1,0 +1,3 @@
+{
+  "extends": "@round/typescript-config/base.json"
+}

@@ -1,0 +1,39 @@
+{
+  "name": "round",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "format": "turbo format",
+    "clean": "turbo run clean && rm -rf node_modules pnpm-lock.yaml",
+    "native": "pnpm --filter mobile start -c",
+    "server": "pnpm --filter @round/server dev",
+    "ncu": "pnpm dlx npm-check-updates -p pnpm --workspaces --root"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.6.1",
+    "@round/typescript-config": "workspace:*",
+    "turbo": "^1.12.5"
+  },
+  "packageManager": "pnpm@8.11.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "resolutions": {
+    "react-refresh": "~0.14.0"
+  },
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": [
+        "darwin",
+        "linux"
+      ],
+      "cpu": [
+        "arm64",
+        "x64"
+      ]
+    }
+  }
+}

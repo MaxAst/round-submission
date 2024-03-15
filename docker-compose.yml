@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: round_db
+      POSTGRES_USER: max
+      POSTGRES_PASSWORD: round
+    volumes:
+      - round_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Different host port from ProjectA
+
+  redis:
+    image: redis:latest
+    volumes:
+      - round_redis_data:/data
+    ports:
+      - "6379:6379" # Different host port from ProjectA
+
+volumes:
+  round_postgres_data:
+  round_redis_data:
